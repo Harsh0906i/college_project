@@ -176,8 +176,8 @@ app.post('/chat', async (req, res) => {
             reply = 'SICA College has basic sports facilities to encourage physical activities among students, promoting a balanced approach to health and academics.';
         } else if (normalizedMessage.includes('canteen')) {
             reply = 'SICA College provides a canteen facility for students to enjoy meals and refreshments in a comfortable space.';
-        } else if (normalizedMessage.includes('computer lab') || normalizedMessage.includes('labs')) {
-            reply = 'SICA College has computer labs equipped with essential software and hardware to support students’ technical learning needs.';
+        } else if (normalizedMessage.includes('labs')) {
+            reply = 'SICA College have a computer lab equipped with software and hardware and a physics lab to support students learning needs.';
         } else if (normalizedMessage.includes('extracurricular') || normalizedMessage.includes('activities')) {
             reply = 'SICA College organizes extracurricular activities such as cultural events and competitions to encourage overall student development.';
         } else if (normalizedMessage.includes('hostel')) {
