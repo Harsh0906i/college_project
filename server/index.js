@@ -56,7 +56,9 @@ const addTrainingDataAndUpdateModel = async (language, sentence, intent) => {
         throw new Error('Error saving new training data');
     }
 };
-
+app.get('/', (req, res) => {
+    res.send('working!')
+})
 app.post('/addTrainingData', async (req, res) => {
     const data = req.body;
 
