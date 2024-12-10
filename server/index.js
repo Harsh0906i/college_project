@@ -7,8 +7,8 @@ const BotSchema = require('./model/BotSchema');
 const app = express();
 app.use(bodyParser.json());
 app.use(cors());
-
-mongoose.connect('mongodb://localhost:27017/nlpData', {
+// mongodb://localhost:27017/nlpData
+mongoose.connect("mongodb+srv://harshitsingharya24:AlLLGk8qXY9fzHJA@cluster0.afo0r.mongodb.net/", {
     useNewUrlParser: true,
     useUnifiedTopology: true,
 }).then(() => {
