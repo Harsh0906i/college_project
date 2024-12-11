@@ -109,12 +109,11 @@ app.post('/chat', async (req, res) => {
         const normalizedMessage = message.toLowerCase();
 
         if (normalizedMessage.includes('sica college') || normalizedMessage.includes('recommend')) {
-            reply = "SICA College has its strengths, but it's important to consider your priorities, such as placements, facilities, and course offerings, before deciding. Let me know if you'd like more details!";
+            reply = "SICA College has its strengths and weaknesses, but it's important to consider your priorities, such as placements, facilities, and course offerings, before deciding. I'm just here to provide you the relevant details";
         }
-        else if (normalizedMessage.includes('bye') || normalizedMessage.includes('goodbye') || normalizedMessage.includes('by') || normalizedMessage.includes('see you')) {
+        else if (normalizedMessage.includes('bye') || normalizedMessage.includes('by') || normalizedMessage.includes('goodbye') || normalizedMessage.includes('see you')) {
             reply = "The Terminator has left the chat... but remember, I'll be back! 💀";
         }
-
         else {
             reply = "I'm Terminator, your tech-savvy assistant. Ready to help, but I promise I won't terminate you! HAHAHAHA";
         }
