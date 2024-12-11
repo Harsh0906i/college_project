@@ -54,7 +54,7 @@ function App() {
       }, 1000);
     } catch (error) {
       console.error("Error connecting to the backend:", error);
-      setMessages([ 
+      setMessages([
         ...newMessages,
         { sender: "bot", text: "Error: Unable to fetch response.", time: getCurrentTime() },
       ]);
