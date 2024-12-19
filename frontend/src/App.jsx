@@ -36,7 +36,7 @@ function App() {
 
     try {
       setTimeout(async () => {
-        const response = await fetch("http://localhost:5000/chat", {
+        const response = await fetch("https://clg-project-backend-psi.vercel.app/chat", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",

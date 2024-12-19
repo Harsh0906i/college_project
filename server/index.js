@@ -8,14 +8,15 @@ const app = express();
 app.use(bodyParser.json());
 app.use(cors());
 // mongodb://localhost:27017/nlpData
-mongoose.connect("mongodb+srv://harshitsingharya24:AlLLGk8qXY9fzHJA@cluster0.afo0r.mongodb.net/", {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-}).then(() => {
-    console.log('Connected to MongoDB');
-}).catch(err => {
-    console.log('Error connecting to MongoDB: ', err);
-});
+main()
+    .then(() => {
+        console.log("success");
+    }).catch((err) => {
+        console.log(err);
+    });
+async function main() {
+    await mongoose.connect("mongodb+srv://harshitsingharya24:AlLLGk8qXY9fzHJA@cluster0.afo0r.mongodb.net/");
+};
 
 const manager = new NlpManager({ languages: ['en'] });
 
