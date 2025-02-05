@@ -127,7 +127,7 @@ function App() {
       <div className="bg-white p-4 border-t flex items-center space-x-2">
         <input
           type="text"
-          placeholder="Ask Terminator..."
+          placeholder="Ask bot..."
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={handleKeyDown}
@@ -151,9 +151,9 @@ function App() {
 
       {/* FAQ Section */}
       {showFAQ && (
-        <div className="fixed bottom-0 left-0 right-0 bg-white p-4 max-h-60 overflow-y-auto border-t">
+        <div className="fixed bottom-0 left-0 right-0 bg-white p-4  border-t">
           <div className="flex justify-between items-center">
-            <h3 className="font-semibold text-lg mb-4">Frequently Asked Questions</h3>
+            <h3 className="font-semibold shadow-lg text-lg mb-4">Frequently Asked Questions</h3>
             <button
               onClick={closeFAQ}
               className="bg-red-500 text-white px-3 py-1 rounded-full hover:bg-red-600"

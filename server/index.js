@@ -4,10 +4,10 @@ const cors = require('cors');
 const { NlpManager } = require('node-nlp');
 const mongoose = require('mongoose');
 const BotSchema = require('./model/BotSchema');
+// const Response = require('./model/response');
 const app = express();
 app.use(bodyParser.json());
 app.use(cors());
-// mongodb://localhost:27017/nlpData
 main()
     .then(() => {
         console.log("success");
@@ -15,10 +15,24 @@ main()
         console.log(err);
     });
 async function main() {
+    // mongodb://localhost:27017/nlpData
     await mongoose.connect("mongodb+srv://harshitsingharya24:AlLLGk8qXY9fzHJA@cluster0.afo0r.mongodb.net/");
 };
-
 const manager = new NlpManager({ languages: ['en'] });
+
+
+// const Response = require('./model/ResponseSchema');
+
+// app.post('/addResponses', async (req, res) => {
+//     const responses = req.body; // Array of responses
+//     try {
+//         await Response.insertMany(responses);
+//         res.status(200).json({ message: 'Responses added successfully!' });
+//     } catch (err) {
+//         res.status(500).json({ error: err.message });
+//     }
+// });
+
 
 const loadTrainingDataFromDB = async () => {
     try {
@@ -37,10 +51,10 @@ const loadTrainingDataFromDB = async () => {
 
 loadTrainingDataFromDB();
 
-async function fetchGeneral() {
-    const query = await BotSchema.deleteMany({ intent: 'general.query' })
-    console.log(query)
-}
+// async function fetchGeneral() {
+//     const query = await BotSchema.deleteMany({ intent: 'general.query' })
+//     console.log(query)
+// }
 
 // fetchGeneral()
 
@@ -182,7 +196,7 @@ app.post('/chat', async (req, res) => {
         }
         else if (normalizedMessage.includes('campus') || normalizedMessage.includes('big') || normalizedMessage.includes('large') || normalizedMessage.includes('size')) {
             reply = 'The campus of SICA College is not very large. It is shared with a school, and the space is more compact compared to other colleges. However, we focus on providing a strong educational experience in the available space.';
-        }        
+        }
         else if (normalizedMessage.includes('mission of sica college') || normalizedMessage.includes('vision of sica college')) {
             reply = 'SICA College’s mission is to provide students with a balanced approach to education, focusing on both academic achievement and personal development, while nurturing a sense of cultural responsibility and ethical values.';
         }
@@ -236,6 +250,13 @@ app.post('/chat', async (req, res) => {
             normalizedMessage.includes('installment plan')) {
             reply = "Yes, SICA College offers the option to pay fees in installments. Please contact the admissions office or the accounts department for more details on the installment plan.";
         }
+
+        else if (normalizedMessage.includes('fee payment') ||
+            normalizedMessage.includes('tuition fees') ||
+            normalizedMessage.includes('fee schedule')) {
+            reply = "SICA College allows students to pay their fees in installments. For further details on the fee payment schedule, please contact the accounts office.";
+        }
+
         // Handle queries for Postgraduate (PG) courses
         else if (normalizedMessage.includes('pg') ||
             normalizedMessage.includes('master') ||
@@ -262,7 +283,7 @@ app.post('/chat', async (req, res) => {
                 const feesDetails = matchedCourses
                     .map(course => `${course.toUpperCase()} - ${feesMapping[course]}`)
                     .join(', ');
-                reply = `The fees for the requested courses are: ${feesDetails}.`;
+                reply = `The fees for the following UG courses are: ${feesDetails}.`;
             } else {
                 const allFees = Object.entries(feesMapping)
                     .map(([course, fee]) => `${course.toUpperCase()} - ${fee}`)
@@ -271,11 +292,7 @@ app.post('/chat', async (req, res) => {
             }
 
             // Handling more fee-related queries (e.g., fee payment schedule)
-            if (normalizedMessage.includes('fee payment') ||
-                normalizedMessage.includes('tuition fees') ||
-                normalizedMessage.includes('fee schedule')) {
-                reply = "SICA College allows students to pay their fees in installments. For further details on the fee payment schedule, please contact the accounts office.";
-            }
+
         }
     }
 
@@ -283,15 +300,39 @@ app.post('/chat', async (req, res) => {
         let courses = [];
         const normalizedMessage = message.toLowerCase();
 
+        // Map full forms and keywords to short forms and responses
         const courseKeywords = {
             bca: 'BCA, a comprehensive course focusing on computer applications and software development.',
+            'bachelor of computer applications': 'BCA, a comprehensive course focusing on computer applications and software development.',
             bba: 'BBA, focusing on business management and entrepreneurial skills.',
+            'bachelor of business administration': 'BBA, focusing on business management and entrepreneurial skills.',
             bcom: 'B.Com, focusing on commerce, accounting, and business practices.',
+            'bachelor of commerce': 'B.Com, focusing on commerce, accounting, and business practices.',
             bajmc: 'BAJMC, a multidisciplinary program in Journalism and Mass Communication.',
-            ba: 'BA, providing a foundation in the humanities with various subject options.'
+            'bachelor of arts in journalism and mass communication': 'BAJMC, a multidisciplinary program in Journalism and Mass Communication.',
+            ba: 'BA, providing a foundation in the humanities with various subject options.',
+            'bachelor of arts': 'BA, providing a foundation in the humanities with various subject options.'
         };
 
-        if (normalizedMessage.includes('pg') ||
+        if (normalizedMessage.includes('department') || normalizedMessage.includes('category') || normalizedMessage.includes('courses')) {
+            reply = `SICA College has the following academic departments: 
+            1. Computer Applications Department (BCA) 
+            2. Business Administration Department (BBA) 
+            3. Commerce Department (B.Com) 
+            4. Journalism and Mass Communication Department (BAJMC) 
+            5. Humanities Department (BA).`;
+        }
+
+        else if (normalizedMessage.includes('eligibility') || normalizedMessage.includes('eligblity') || normalizedMessage.includes('eligible')) {
+            reply = 'You can contact us via the provided phone: 0731-2974255, 8871729595, or 9669808182 to check your eligibility for your desired course.';
+        }
+        // Handle duration-related queries
+        else if (normalizedMessage.includes('duration') || normalizedMessage.includes('how long')) {
+            reply = 'The duration of undergraduate (UG) courses at SICA College is typically 3 years, which includes 3 annual papers.';
+        }
+
+        // Check for PG-related queries
+        else if (normalizedMessage.includes('pg') ||
             normalizedMessage.includes('master') ||
             normalizedMessage.includes('mba') ||
             normalizedMessage.includes('mca') ||
@@ -302,29 +343,22 @@ app.post('/chat', async (req, res) => {
             normalizedMessage.includes('llm') ||
             normalizedMessage.includes('msw') ||
             normalizedMessage.includes('post graduate') ||
+            normalizedMessage.includes('postgraduate') ||
             normalizedMessage.includes('med')) {
             reply = 'Currently, SICA College does not offer any postgraduate (PG) courses. However, we are planning to introduce PG courses in the future.';
         }
-        else if (normalizedMessage.includes('eligiblity') || normalizedMessage.includes('eligblity') || normalizedMessage.includes('eligible')) {
-            reply = 'You can contact us via the provided phone : 0731-2974255, 8871729595, or 9669808182 or to check you eligiblity for your desired course'
-        }
+
         else {
-            const tokens = normalizedMessage
-                .replace(/,| and /g, ' ')
-                .split(' ')
-                .filter(token => token.trim().length > 0);
+            const courseMatches = Object.keys(courseKeywords).filter(keyword =>
+                normalizedMessage.split(' ').some(word => word === keyword) // Split and check exact words
+            );
 
-            tokens.forEach(token => {
-                if (courseKeywords[token]) {
-                    courses.push(courseKeywords[token]);
-                }
-            });
-
-            if (courses.length > 0) {
-                reply = `SICA College offers ${courses.join(' ')}`;
-            }
-
-            else {
+            if (courseMatches.length > 0) {
+                courseMatches.forEach(match => {
+                    courses.push(courseKeywords[match]);
+                });
+                reply = `SICA College offers the following UG courses: ${courses.join(' ')}`;
+            } else {
                 reply = 'Our UG programs include B.Com, BBA, BCA, BAJMC, and BA. Admissions are based on merit.';
             }
         }
@@ -345,11 +379,11 @@ app.post('/chat', async (req, res) => {
         }
         else if (normalizedMessage.includes('hostel')) {
             reply = 'Currently, SICA College does not offer hostel facilities.';
-        }        
+        }
         else if (normalizedMessage.includes('sports') || normalizedMessage.includes('game') || normalizedMessage.includes('play')) {
             reply = 'SICA College offers a variety of sports facilities including indoor and outdoor games. Students can enjoy sports like cricket, football, basketball, and more.';
         }
-        else if (normalizedMessage.includes('wifi') || normalizedMessage.includes('internet')) {
+        else if (normalizedMessage.includes('wi-fi') || normalizedMessage.includes('wifi') || normalizedMessage.includes('internet')) {
             reply = 'Yes, SICA College provides Wi-Fi across the campus, ensuring students have access to the internet for academic and personal use. However, connectivity might vary in different areas of the campus.';
         }
         else if (normalizedMessage.includes('hostel') || normalizedMessage.includes('accommodation')) {
@@ -396,6 +430,35 @@ app.post('/chat', async (req, res) => {
 
     res.json({ reply });
 });
+
+// app.post('/chat', async (req, res) => {
+//     const { message } = req.body;
+
+//     try {
+//         const response = await manager.process('en', message);
+
+//         if (response.score > 0.5) {
+//             const intentResponse = await Response.findOne({ intent: response.intent });
+
+//             if (intentResponse) {
+//                 // Check for specific conditions
+//                 const condition = intentResponse.conditions.find(c =>
+//                     new RegExp(c.match, 'i').test(message)
+//                 );
+
+//                 const reply = condition ? condition.response : intentResponse.defaultResponse;
+//                 return res.status(200).json({ reply });
+//             } else {
+//                 return res.status(404).json({ reply: "I don't have an answer for that yet. Let me learn!" });
+//             }
+//         } else {
+//             return res.status(200).json({ reply: "I'm sorry, I didn't understand that. Could you rephrase your question?" });
+//         }
+//     } catch (err) {
+//         console.error(err);
+//         res.status(500).json({ error: "An error occurred while processing your request." });
+//     }
+// });
 
 const PORT = 5000;
 app.listen(PORT, () => {
