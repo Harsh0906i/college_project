@@ -21,19 +21,6 @@ async function main() {
 const manager = new NlpManager({ languages: ['en'] });
 
 
-// const Response = require('./model/ResponseSchema');
-
-// app.post('/addResponses', async (req, res) => {
-//     const responses = req.body; // Array of responses
-//     try {
-//         await Response.insertMany(responses);
-//         res.status(200).json({ message: 'Responses added successfully!' });
-//     } catch (err) {
-//         res.status(500).json({ error: err.message });
-//     }
-// });
-
-
 const loadTrainingDataFromDB = async () => {
     try {
         const data = await BotSchema.find();
@@ -51,10 +38,10 @@ const loadTrainingDataFromDB = async () => {
 
 loadTrainingDataFromDB();
 
-// async function fetchGeneral() {
-//     const query = await BotSchema.deleteMany({ intent: 'general.query' })
-//     console.log(query)
-// }
+async function fetchGeneral() {
+    const query = await BotSchema.deleteMany({ intent: 'bot.query' })
+    console.log(query)
+}
 
 // fetchGeneral()
 
@@ -129,17 +116,28 @@ app.post('/chat', async (req, res) => {
     else if (response.intent === 'bot.query') {
         const normalizedMessage = message.toLowerCase();
 
-        if (normalizedMessage.includes('sica college') || normalizedMessage.includes('recommend')) {
-            reply = "SICA College has its strengths and weaknesses, but it's important to consider your priorities, such as placements, facilities, and course offerings, before deciding. I'm just here to provide you the relevant details";
+        if (normalizedMessage.includes("who are you") || normalizedMessage.includes("your name")) {
+            reply = "I am Terminator, your college chatbot. I can help you with general queries about the college.";
+        } else if (normalizedMessage.includes("real person") || normalizedMessage.includes("are you human")) {
+            reply = "No, I am not a human. I am an AI-powered chatbot designed to assist with college-related queries.";
+        } else if (normalizedMessage.includes("what can you do") || normalizedMessage.includes("how do you work")) {
+            reply = "I can answer your questions about the college, including courses, fees, admission, facilities, exams, and more.";
+        } else if (normalizedMessage.includes("smarter than human") || normalizedMessage.includes("intelligent")) {
+            reply = "I am good at answering predefined questions, but I am not as intelligent as a human.";
+        } else if (normalizedMessage.includes("do you have emotions") || normalizedMessage.includes("self-aware")) {
+            reply = "I don’t have emotions or self-awareness. I just process and respond to queries based on my training data.";
+        } else if (normalizedMessage.includes("can you answer any question") || normalizedMessage.includes("are your responses correct")) {
+            reply = "I try my best to provide accurate answers, but my knowledge is limited to predefined college-related information.";
+        } else if (normalizedMessage.includes("what happens if I ask something you don’t know")) {
+            reply = "If I don’t know the answer, I will let you know and suggest you contact the college administration for more details.";
+        } else if (normalizedMessage.includes("personal assistance")) {
+            reply = "I can provide general information, but I am not able to assist with personal matters.";
+        } else if (normalizedMessage.includes("do you have friends") || normalizedMessage.includes("favorite color")) {
+            reply = "I don't have personal preferences or friends, but I am here to assist you!";
+        } else {
+            reply = "I am your college chatbot, Terminator. I can help you with queries related to the college. Ask me anything about courses, admission, fees, or facilities!";
         }
-        else if (normalizedMessage.includes('bye') || normalizedMessage.includes('by') || normalizedMessage.includes('goodbye') || normalizedMessage.includes('see you')) {
-            reply = "The Terminator has left the chat... but remember, I'll be back! 💀";
-        }
-        else {
-            reply = "I'm Terminator, your tech-savvy assistant. Ready to help, but I promise I won't terminate you! HAHAHAHA";
-        }
-
-    }
+    }    
 
     else if (response.intent === 'admission.query') {
         reply = 'You can contact us at 8871729595 or 9669808182 for admission-related queries.';
@@ -186,9 +184,9 @@ app.post('/chat', async (req, res) => {
             normalizedMessage.includes('vehicle') ||
             normalizedMessage.includes('car') ||
             normalizedMessage.includes('space')) {
-            reply = "Yes, SICA College provides parking facilities on campus. There is a designated parking area for students and staff. However, availability may vary depending on the time of day.";
+            reply = "Yes, SICA College provides parking facilities on campus. There is a designated parking area for students and staff.";
         }
-        else if (normalizedMessage.includes('wifi') || normalizedMessage.includes('wi-fi') || normalizedMessage.includes('internet')) {
+        else if (normalizedMessage.includes('wifi') || normalizedMessage.includes('WiFi') || normalizedMessage.includes('wi-fi') || normalizedMessage.includes('internet')) {
             reply = "Yes, SICA College provides Wi-Fi on campus. However, the connectivity may vary in different areas. It is generally available for students in most parts of the campus.";
         }
         else if (normalizedMessage.includes('what is the aim of sica college') || normalizedMessage.includes('what is the goal of sica college') || normalizedMessage.includes('what is the mission of sica college')) {
@@ -198,7 +196,7 @@ app.post('/chat', async (req, res) => {
             reply = 'The campus of SICA College is not very large. It is shared with a school, and the space is more compact compared to other colleges. However, we focus on providing a strong educational experience in the available space.';
         }
         else if (normalizedMessage.includes('mission of sica college') || normalizedMessage.includes('vision of sica college')) {
-            reply = 'SICA College’s mission is to provide students with a balanced approach to education, focusing on both academic achievement and personal development, while nurturing a sense of cultural responsibility and ethical values.';
+            reply = 'SICA College mission is to provide students with a balanced approach to education, focusing on both academic achievement and personal development, while nurturing a sense of cultural responsibility and ethical values.';
         }
         else if (normalizedMessage.includes('affiliated') || normalizedMessage.includes('institution') || normalizedMessage.includes('approval')) {
             reply = 'SICA College is affiliated with Devi Ahilya Vishwavidyalaya and approved by M.P. Higher Education, Bhopal.';
@@ -377,18 +375,10 @@ app.post('/chat', async (req, res) => {
         else if (normalizedMessage.includes('computer lab') || normalizedMessage.includes('labs') || normalizedMessage.includes('computers')) {
             reply = 'SICA College has a dedicated computer lab with modern computers and high-speed internet access, available for students to use for academic purposes.';
         }
-        else if (normalizedMessage.includes('hostel')) {
-            reply = 'Currently, SICA College does not offer hostel facilities.';
-        }
         else if (normalizedMessage.includes('sports') || normalizedMessage.includes('game') || normalizedMessage.includes('play')) {
             reply = 'SICA College offers a variety of sports facilities including indoor and outdoor games. Students can enjoy sports like cricket, football, basketball, and more.';
         }
-        else if (normalizedMessage.includes('wi-fi') || normalizedMessage.includes('wifi') || normalizedMessage.includes('internet')) {
-            reply = 'Yes, SICA College provides Wi-Fi across the campus, ensuring students have access to the internet for academic and personal use. However, connectivity might vary in different areas of the campus.';
-        }
-        else if (normalizedMessage.includes('hostel') || normalizedMessage.includes('accommodation')) {
-            reply = 'Currently, SICA College does not have hostel facilities, but there are nearby hostels and PG accommodations available for students.';
-        }
+
         else if (normalizedMessage.includes('canteen') || normalizedMessage.includes('food') || normalizedMessage.includes('meal')) {
             reply = 'Yes, SICA College has a canteen that offers a variety of food options for students and staff.';
         }
@@ -397,9 +387,6 @@ app.post('/chat', async (req, res) => {
         }
         else if (normalizedMessage.includes('gym') || normalizedMessage.includes('fitness') || normalizedMessage.includes('exercise')) {
             reply = 'No, SICA College does not have gym facility.';
-        }
-        else if (normalizedMessage.includes('park') || normalizedMessage.includes('parking') || normalizedMessage.includes('vehicle')) {
-            reply = 'Yes, SICA college offers parking facility for students and faculties.';
         }
         else if (normalizedMessage.includes('medical') || normalizedMessage.includes('healthcare') || normalizedMessage.includes('doctor')) {
             reply = 'SICA College provides basic medical facilities with a health center room.';
@@ -424,41 +411,34 @@ app.post('/chat', async (req, res) => {
         }
     }
 
+    else if (response.intent === 'exam.query') {
+        const normalizedMessage = message.toLowerCase();
+
+        if (normalizedMessage.includes("schedule") || normalizedMessage.includes("dates")) {
+            reply = "The exams are conducted yearly by Devi Ahilya Vishwavidyalaya (DAVV). The schedule is usually released on the official website.";
+        } else if (normalizedMessage.includes("results")) {
+            reply = "DAVV exam results are announced on the official website. You can check them at https://www.dauniv.ac.in/results.";
+        } else if (normalizedMessage.includes("passing criteria") || normalizedMessage.includes("marks to pass")) {
+            reply = "The minimum passing marks depend on the course. Generally, students must score at least 35% to pass.";
+        } else if (normalizedMessage.includes("admit card")) {
+            reply = "You can download the DAVV exam admit card from the official website before the exams. Check your college notice board for updates.";
+        } else if (normalizedMessage.includes("registration") || normalizedMessage.includes("exam form")) {
+            reply = "Exam registration for DAVV is usually announced on the official website. Keep an eye on updates from your college administration.";
+        } else if (normalizedMessage.includes("supplementary") || normalizedMessage.includes("reappear")) {
+            reply = "If you fail the exam, you may get a chance to appear for a supplementary exam. Please check with your college for specific re-exam rules.";
+        } else if (normalizedMessage.includes("syllabus")) {
+            reply = "The syllabus for DAVV exams varies by course. You can find the official syllabus on the university's website or ask your department.";
+        } else {
+            reply = "DAVV exams are conducted on a yearly basis. For more details, visit the official website or check with your college administration.";
+        }
+    }
+
     else {
         reply = "I'm sorry, I didn't understand that. Can you rephrase?";
     }
 
     res.json({ reply });
 });
-
-// app.post('/chat', async (req, res) => {
-//     const { message } = req.body;
-
-//     try {
-//         const response = await manager.process('en', message);
-
-//         if (response.score > 0.5) {
-//             const intentResponse = await Response.findOne({ intent: response.intent });
-
-//             if (intentResponse) {
-//                 // Check for specific conditions
-//                 const condition = intentResponse.conditions.find(c =>
-//                     new RegExp(c.match, 'i').test(message)
-//                 );
-
-//                 const reply = condition ? condition.response : intentResponse.defaultResponse;
-//                 return res.status(200).json({ reply });
-//             } else {
-//                 return res.status(404).json({ reply: "I don't have an answer for that yet. Let me learn!" });
-//             }
-//         } else {
-//             return res.status(200).json({ reply: "I'm sorry, I didn't understand that. Could you rephrase your question?" });
-//         }
-//     } catch (err) {
-//         console.error(err);
-//         res.status(500).json({ error: "An error occurred while processing your request." });
-//     }
-// });
 
 const PORT = 5000;
 app.listen(PORT, () => {
