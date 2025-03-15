@@ -4,7 +4,6 @@ const cors = require('cors');
 const { NlpManager } = require('node-nlp');
 const mongoose = require('mongoose');
 const BotSchema = require('./model/BotSchema');
-// const Response = require('./model/response');
 const app = express();
 app.use(bodyParser.json());
 app.use(cors());
@@ -38,10 +37,10 @@ const loadTrainingDataFromDB = async () => {
 
 loadTrainingDataFromDB();
 
-async function fetchGeneral() {
-    const query = await BotSchema.deleteMany({ intent: 'bot.query' })
-    console.log(query)
-}
+// async function fetchGeneral() {
+//     const query = await BotSchema.deleteMany({ intent: 'bot.query' })
+//     console.log(query)
+// }
 
 // fetchGeneral()
 
@@ -123,7 +122,7 @@ app.post('/chat', async (req, res) => {
         } else if (normalizedMessage.includes("what can you do") || normalizedMessage.includes("how do you work")) {
             reply = "I can answer your questions about the college, including courses, fees, admission, facilities, exams, and more.";
         } else if (normalizedMessage.includes("smarter than human") || normalizedMessage.includes("intelligent")) {
-            reply = "I am good at answering predefined questions, but I am not as intelligent as a human.";
+            reply = "I am good at answering questions, but I am not as intelligent as a human.";
         } else if (normalizedMessage.includes("do you have emotions") || normalizedMessage.includes("self-aware")) {
             reply = "I don’t have emotions or self-awareness. I just process and respond to queries based on my training data.";
         } else if (normalizedMessage.includes("can you answer any question") || normalizedMessage.includes("are your responses correct")) {
@@ -134,10 +133,13 @@ app.post('/chat', async (req, res) => {
             reply = "I can provide general information, but I am not able to assist with personal matters.";
         } else if (normalizedMessage.includes("do you have friends") || normalizedMessage.includes("favorite color")) {
             reply = "I don't have personal preferences or friends, but I am here to assist you!";
-        } else {
+        } else if (normalizedMessage.includes("who created you") || normalizedMessage.includes("who made you")) {
+            reply = "I was developed by Harshit Singh Arya as a college project using the MERN stack.";
+        }
+        else {
             reply = "I am your college chatbot, Terminator. I can help you with queries related to the college. Ask me anything about courses, admission, fees, or facilities!";
         }
-    }    
+    }
 
     else if (response.intent === 'admission.query') {
         reply = 'You can contact us at 8871729595 or 9669808182 for admission-related queries.';
@@ -148,7 +150,7 @@ app.post('/chat', async (req, res) => {
             reply = 'You can contact us at 0731-2974255, 8871729595, or 9669808182 for any inquiries related to admissions.';
         }
         else if (message.toLowerCase().includes('email') || message.toLowerCase().includes('email address')) {
-            reply = 'Our official emails are: sicacollegeindore@gmail.com, antiragging@sicacollegeindore.com, grievance@sicacollegeindore.com.';
+            reply = 'Our official emails are: sicacollegeindore@gmail.com, grievance@sicacollegeindore.com.';
         }
         else if (message.toLowerCase().includes('located') || message.toLowerCase().includes('address') || message.toLowerCase().includes('location') || message.toLowerCase().includes('reach')) {
             reply = 'SICA College is located at Nipania Main Road, Near Iskcon Temple, ahead of Advanced Academy School, Indore, Madhya Pradesh 452010.';
@@ -163,6 +165,10 @@ app.post('/chat', async (req, res) => {
             reply = "SICA College is open for visits from Monday to Saturday, 10:00 AM to 5:00 PM. On Sundays, the college is usually closed. Please contact the administration office to confirm availability before visiting.";
         }
 
+        else if (message.toLowerCase().includes('website') || message.toLowerCase().includes('web form') || message.toLowerCase().includes('enquiry form')) {
+            reply = 'You can submit an inquiry form on our official website: https://www.sicacollegeindore.com/contact-us/';
+        }
+
         else {
             reply = 'You can contact us via the provided phone : 0731-2974255, 8871729595, or 9669808182 or reach out by email for any queries : sicacollegeindore@gmail.com, antiragging@sicacollegeindore.com, grievance@sicacollegeindore.com.';
         }
@@ -171,7 +177,6 @@ app.post('/chat', async (req, res) => {
     else if (response.intent === 'general.query') {
         const normalizedMessage = message.toLowerCase();
 
-        // Check for different variations of the question related to SICA College
         if (normalizedMessage.includes('what is sica college') ||
             normalizedMessage.includes('about sica college') ||
             normalizedMessage.includes('who is sica college') ||
@@ -240,7 +245,6 @@ app.post('/chat', async (req, res) => {
 
         const normalizedMessage = message.toLowerCase();
 
-        // Handle installment-related queries first
         if (normalizedMessage.includes('installments') ||
             normalizedMessage.includes('pay in parts') ||
             normalizedMessage.includes('split fees') ||
@@ -255,7 +259,6 @@ app.post('/chat', async (req, res) => {
             reply = "SICA College allows students to pay their fees in installments. For further details on the fee payment schedule, please contact the accounts office.";
         }
 
-        // Handle queries for Postgraduate (PG) courses
         else if (normalizedMessage.includes('pg') ||
             normalizedMessage.includes('master') ||
             normalizedMessage.includes('mba') ||
@@ -270,10 +273,9 @@ app.post('/chat', async (req, res) => {
             reply = 'Currently, SICA College does not offer any PG courses. However, MBA is an upcoming course and will be launched soon. Stay tuned for updates!';
         }
         else {
-            // Handling fees for specific courses
             const courseNames = Object.keys(feesMapping);
             const matchedCourses = courseNames.filter(course => {
-                const regex = new RegExp(`\\b${course}\\b`, 'i'); // Use word boundary to match the exact course
+                const regex = new RegExp(`\\b${course}\\b`, 'i'); 
                 return regex.test(normalizedMessage);
             });
 
@@ -289,7 +291,6 @@ app.post('/chat', async (req, res) => {
                 reply = `The fees for our UG programs are as follows: ${allFees}. Fees are subject to change based on college policies.`;
             }
 
-            // Handling more fee-related queries (e.g., fee payment schedule)
 
         }
     }
@@ -298,7 +299,6 @@ app.post('/chat', async (req, res) => {
         let courses = [];
         const normalizedMessage = message.toLowerCase();
 
-        // Map full forms and keywords to short forms and responses
         const courseKeywords = {
             bca: 'BCA, a comprehensive course focusing on computer applications and software development.',
             'bachelor of computer applications': 'BCA, a comprehensive course focusing on computer applications and software development.',
@@ -324,12 +324,10 @@ app.post('/chat', async (req, res) => {
         else if (normalizedMessage.includes('eligibility') || normalizedMessage.includes('eligblity') || normalizedMessage.includes('eligible')) {
             reply = 'You can contact us via the provided phone: 0731-2974255, 8871729595, or 9669808182 to check your eligibility for your desired course.';
         }
-        // Handle duration-related queries
         else if (normalizedMessage.includes('duration') || normalizedMessage.includes('how long')) {
             reply = 'The duration of undergraduate (UG) courses at SICA College is typically 3 years, which includes 3 annual papers.';
         }
 
-        // Check for PG-related queries
         else if (normalizedMessage.includes('pg') ||
             normalizedMessage.includes('master') ||
             normalizedMessage.includes('mba') ||
