@@ -1,48 +1,49 @@
+require('dotenv').config();
 const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const { NlpManager } = require('node-nlp');
 const mongoose = require('mongoose');
 const BotSchema = require('./model/BotSchema');
+const fs = require('fs');
 const app = express();
+const modelPath = './model.nlp'
+const manager = new NlpManager({ languages: ['en'] });
+
 app.use(bodyParser.json());
 app.use(cors());
 main()
     .then(() => {
-        console.log("success");
+        console.log("connected to DB");
     }).catch((err) => {
         console.log(err);
     });
 async function main() {
-    // mongodb://localhost:27017/nlpData
-    await mongoose.connect("mongodb+srv://harshitsingharya24:AlLLGk8qXY9fzHJA@cluster0.afo0r.mongodb.net/");
+    await mongoose.connect(process.env.MONGO_URI);
 };
-const manager = new NlpManager({ languages: ['en'] });
-
 
 const loadTrainingDataFromDB = async () => {
     try {
-        const data = await BotSchema.find();
-        data.forEach(doc => {
-            manager.addDocument(doc.language, doc.sentence, doc.intent);
-        });
+        if (fs.existsSync(modelPath)) {
+            manager.load(modelPath);
+            console.log('Loaded pre-trained NLP model.');
+        } else {
+            console.log('No saved model found. Training new model...');
+            const data = await BotSchema.find();
+            data.forEach(doc => {
+                manager.addDocument(doc.language, doc.sentence, doc.intent);
+            });
 
-        await manager.train();
-        await manager.save();
-        console.log('Training completed and model saved!');
+            await manager.train();
+            await manager.save(modelPath); 
+            console.log('Training completed and model saved!');
+        }
     } catch (err) {
         console.error('Error loading training data: ', err);
     }
 };
 
 loadTrainingDataFromDB();
-
-// async function fetchGeneral() {
-//     const query = await BotSchema.deleteMany({ intent: 'bot.query' })
-//     console.log(query)
-// }
-
-// fetchGeneral()
 
 const addTrainingDataAndUpdateModel = async (language, sentence, intent) => {
     if (!language || !sentence || !intent) {
@@ -56,14 +57,53 @@ const addTrainingDataAndUpdateModel = async (language, sentence, intent) => {
         manager.addDocument(language, sentence, intent);
 
         await manager.train();
-        await manager.save();
+        await manager.save(modelPath);
 
-        console.log('New training data added and model re-trained!');
+        console.log(' New training data added and model updated!');
     } catch (err) {
-        console.error('Error saving new training data: ', err);
+        console.error(' Error saving new training data: ', err);
         throw new Error('Error saving new training data');
     }
 };
+
+// const loadTrainingDataFromDB = async () => {
+//     try {
+//         const data = await BotSchema.find();
+//         data.forEach(doc => {
+//             manager.addDocument(doc.language, doc.sentence, doc.intent);
+//         });
+
+//         await manager.train();
+//         await manager.save();
+//         console.log('Training completed and model saved!');
+//     } catch (err) {
+//         console.error('Error loading training data: ', err);
+//     }
+// };
+
+// loadTrainingDataFromDB();
+
+// const addTrainingDataAndUpdateModel = async (language, sentence, intent) => {
+//     if (!language || !sentence || !intent) {
+//         throw new Error('Language, sentence, and intent are required.');
+//     }
+
+//     try {
+//         const newTrainingData = new BotSchema({ language, sentence, intent });
+//         await newTrainingData.save();
+
+//         manager.addDocument(language, sentence, intent);
+
+//         await manager.train();
+//         await manager.save();
+
+//         console.log('New training data added and model re-trained!');
+//     } catch (err) {
+//         console.error('Error saving new training data: ', err);
+//         throw new Error('Error saving new training data');
+//     }
+// };
+
 app.get('/', (req, res) => {
     res.send('working!')
 })
@@ -157,7 +197,7 @@ app.post('/chat', async (req, res) => {
             else if (message.toLowerCase().includes('email') || message.toLowerCase().includes('email address')) {
                 reply = 'Our official emails are: sicacollegeindore@gmail.com, grievance@sicacollegeindore.com.';
             }
-            else if (message.toLowerCase().includes('located') || message.toLowerCase().includes('address') || message.toLowerCase().includes('location') || message.toLowerCase().includes('reach')) {
+            else if (message.toLowerCase().includes('located') || message.toLowerCase().includes('address') || message.toLowerCase().includes('location') || message.toLowerCase().includes('reach')|| message.toLowerCase().includes('situated')) {
                 reply = 'SICA College is located at Nipania Main Road, Near Iskcon Temple, ahead of Advanced Academy School, Indore, Madhya Pradesh 452010.';
             }
             else if (message.toLowerCase().includes('visit') ||
@@ -254,7 +294,7 @@ app.post('/chat', async (req, res) => {
                 normalizedMessage.includes('pay in parts') ||
                 normalizedMessage.includes('split fees') ||
                 normalizedMessage.includes('pay tuition fees') ||
-                normalizedMessage.includes('installment plan')) {
+                normalizedMessage.includes('installment')) {
                 reply = "Yes, SICA College offers the option to pay fees in installments. Please contact the admissions office or the accounts department for more details on the installment plan.";
             }
 
@@ -378,7 +418,7 @@ app.post('/chat', async (req, res) => {
                 reply = 'SICA College has a dedicated computer lab with modern computers and high-speed internet access, available for students to use for academic purposes.';
             }
             else if (normalizedMessage.includes('sports') || normalizedMessage.includes('game') || normalizedMessage.includes('play')) {
-                reply = 'SICA College offers a variety of sports facilities including indoor and outdoor games. Students can enjoy sports like cricket, football, basketball, and more.';
+                reply = 'SICA College offers a variety of sports facilities including indoor and outdoor games. Students can enjoy sports like cricket, football,kho-kho and more.';
             }
 
             else if (normalizedMessage.includes('canteen') || normalizedMessage.includes('food') || normalizedMessage.includes('meal')) {
@@ -419,14 +459,14 @@ app.post('/chat', async (req, res) => {
             if (normalizedMessage.includes("schedule") || normalizedMessage.includes("dates")) {
                 reply = "The exams are conducted yearly by Devi Ahilya Vishwavidyalaya (DAVV). The schedule is usually released on the official website.";
             } else if (normalizedMessage.includes("results")) {
-                reply = "DAVV exam results are announced on the official website. You can check them at https://www.dauniv.ac.in/results.";
+                reply = "DAVV exam results are announced on the official website.";
             } else if (normalizedMessage.includes("passing criteria") || normalizedMessage.includes("marks to pass")) {
                 reply = "The minimum passing marks depend on the course. Generally, students must score at least 35% to pass.";
             } else if (normalizedMessage.includes("admit card")) {
                 reply = "You can download the DAVV exam admit card from the official website before the exams. Check your college notice board for updates.";
             } else if (normalizedMessage.includes("registration") || normalizedMessage.includes("exam form")) {
                 reply = "Exam registration for DAVV is usually announced on the official website. Keep an eye on updates from your college administration.";
-            } else if (normalizedMessage.includes("supplementary") || normalizedMessage.includes("reappear")) {
+            } else if (normalizedMessage.includes("supplementary") || normalizedMessage.includes("reappear")|| normalizedMessage.includes("fails")|| normalizedMessage.includes("failed")) {
                 reply = "If you fail the exam, you may get a chance to appear for a supplementary exam. Please check with your college for specific re-exam rules.";
             } else if (normalizedMessage.includes("syllabus")) {
                 reply = "The syllabus for DAVV exams varies by course. You can find the official syllabus on the university's website or ask your department.";
@@ -447,3 +487,13 @@ const PORT = 5000;
 app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);
 });
+
+
+
+
+// async function fetchGeneral() {
+//     const query = await BotSchema.deleteMany({ intent: 'bot.query' })
+//     console.log(query)
+// }
+
+// fetchGeneral()
