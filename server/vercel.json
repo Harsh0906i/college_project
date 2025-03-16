@@ -14,7 +14,7 @@
     ],
     "functions": {
       "index.js": {
-        "includeFiles": "data/model.nlp"
+        "includeFiles": "./model.nlp"
       }
     }
   }

@@ -6,7 +6,7 @@ function App() {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [showFAQ, setShowFAQ] = useState(false);  // State to toggle FAQ visibility
+  const [showFAQ, setShowFAQ] = useState(false);  
  
   const messagesEndRef = useRef(null);
 
