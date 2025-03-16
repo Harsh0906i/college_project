@@ -142,8 +142,18 @@ app.post('/chat', async (req, res) => {
     }
 
     else if (response.intent === 'admission.query') {
-        reply = 'You can contact us at 8871729595 or 9669808182 for admission-related queries.';
+        if (message.toLowerCase().includes('scholarship')) {  
+            reply = "Our college offers various government scholarship schemes, including: \n\n" +
+                "✅ Post Metric Scholarship for SC/ST/OBC students\n" +
+                "✅ Post Metric/Merit Cum Means Minority Scholarship for Jain, Muslim, Christian, Sikh, Buddhist, and Parsi students\n" +
+                "✅ Aawas Scholarship (Only for SC/ST students)\n" +
+                "✅ Gaon Ki Beti Yojna (For girls who have scored 60% or above)\n\n";
+        } 
+        else {
+            reply = "You can contact us at 8871729595 or 9669808182 for admission-related queries.";
+        }
     }
+    
 
     else if (response.intent === 'contact.query') {
         if (message.toLowerCase().includes('contact number') || message.toLowerCase().includes('phone')) {
@@ -272,10 +282,11 @@ app.post('/chat', async (req, res) => {
             normalizedMessage.includes('med')) {
             reply = 'Currently, SICA College does not offer any PG courses. However, MBA is an upcoming course and will be launched soon. Stay tuned for updates!';
         }
+
         else {
             const courseNames = Object.keys(feesMapping);
             const matchedCourses = courseNames.filter(course => {
-                const regex = new RegExp(`\\b${course}\\b`, 'i'); 
+                const regex = new RegExp(`\\b${course}\\b`, 'i');
                 return regex.test(normalizedMessage);
             });
 
@@ -290,8 +301,6 @@ app.post('/chat', async (req, res) => {
                     .join(', ');
                 reply = `The fees for our UG programs are as follows: ${allFees}. Fees are subject to change based on college policies.`;
             }
-
-
         }
     }
 
