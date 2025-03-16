@@ -66,44 +66,6 @@ const addTrainingDataAndUpdateModel = async (language, sentence, intent) => {
     }
 };
 
-// const loadTrainingDataFromDB = async () => {
-//     try {
-//         const data = await BotSchema.find();
-//         data.forEach(doc => {
-//             manager.addDocument(doc.language, doc.sentence, doc.intent);
-//         });
-
-//         await manager.train();
-//         await manager.save();
-//         console.log('Training completed and model saved!');
-//     } catch (err) {
-//         console.error('Error loading training data: ', err);
-//     }
-// };
-
-// loadTrainingDataFromDB();
-
-// const addTrainingDataAndUpdateModel = async (language, sentence, intent) => {
-//     if (!language || !sentence || !intent) {
-//         throw new Error('Language, sentence, and intent are required.');
-//     }
-
-//     try {
-//         const newTrainingData = new BotSchema({ language, sentence, intent });
-//         await newTrainingData.save();
-
-//         manager.addDocument(language, sentence, intent);
-
-//         await manager.train();
-//         await manager.save();
-
-//         console.log('New training data added and model re-trained!');
-//     } catch (err) {
-//         console.error('Error saving new training data: ', err);
-//         throw new Error('Error saving new training data');
-//     }
-// };
-
 app.get('/', (req, res) => {
     res.send('working!')
 })
@@ -141,8 +103,8 @@ app.post('/chat', async (req, res) => {
     const response = await manager.process('en', message);
     let reply;
 
-    if (response.score > 0.5) {
-        console.log('Intent recognized: ', response.intent);
+    if (response.intent !== 'None' && response.score > 0.5) {
+        console.log('Intent recognized:',response.intent);
 
         if (response.intent === 'greeting') {
             reply = 'Hi there! How can I help you?';
@@ -474,9 +436,9 @@ app.post('/chat', async (req, res) => {
                 reply = "DAVV exams are conducted on a yearly basis. For more details, visit the official website or check with your college administration.";
             }
         }
-    }
 
-    else {
+    } else {
+        console.log('Intent not recognized.');
         reply = "I'm sorry, I didn't understand that. Can you rephrase?";
     }
 
@@ -487,9 +449,6 @@ const PORT = 5000;
 app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);
 });
-
-
-
 
 // async function fetchGeneral() {
 //     const query = await BotSchema.deleteMany({ intent: 'bot.query' })
